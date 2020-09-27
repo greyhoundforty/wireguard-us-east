@@ -2,10 +2,10 @@
 
 ## Update machine
 DEBIAN_FRONTEND=noninteractive apt-get -qqy update
-DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' dist-upgrade
+DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
 
-## Install Docker 
-DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl git python3-pip wireguard at unzip 
+## Install Wireguard and basic tools 
+DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl git wireguard at unzip 
 
 systemctl enable --now atd
 
@@ -27,6 +27,8 @@ consul kv put wireguard/server_public_key @/etc/wireguard/publickey
 consul kv put wireguard/server_private_key @/etc/wireguard/privatekey
 
 ## Download Wireguard configuration file 
+wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/wg0.conf-example
+mv wg0.conf-example /etc/wireguard/wg0.conf
 
 export CLIENT_PUBLIC_KEY=${client_public_key}
 sed -i "|CLIENT_PUBLIC_KEY_PLACEHOLDER|$CLIENT_PUBLIC_KEY|" /etc/wireguard/wg0.conf
@@ -36,7 +38,8 @@ PRIVATE_KEY=`cat /etc/wireguard/privatekey`
 sed -i "|PRIVATE_KEY_PLACEHOLDER|$PRIVATE_KEY|" /etc/wireguard/wg0.conf
 
 ## Download cloud-init per-once script 
-
+wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/start-wg.sh
+mv start-wg.sh /var/lib/cloud/scripts/start-wg.sh
 chmod +x /var/lib/cloud/scripts/start-wg.sh
 
 /usr/bin/at now + 2 minutes <<END
