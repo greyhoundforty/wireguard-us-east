@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 ## Update machine
-DEBIAN_FRONTEND=noninteractive apt -qqy update
+DEBIAN_FRONTEND=noninteractive apt-get -qqy update
 DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' dist-upgrade
 
 ## Install Docker 
-DEBIAN_FRONTEND=noninteractive apt -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl git python3-pip wireguard at 
+DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl git python3-pip wireguard at unzip 
 
 systemctl enable --now atd
 
@@ -13,40 +13,32 @@ systemctl enable --now atd
 /usr/bin/wg genkey | tee /etc/wireguard/privatekey | /usr/bin/wg pubkey | tee /etc/wireguard/publickey
 
 ## Install consul
-snap install consul 
+curl --silent --remote-name https://releases.hashicorp.com/consul/1.8.0/consul_1.8.0_linux_amd64.zip
+unzip consul_1.8.0_linux_amd64.zip
+chown root:root consul
+mv consul /usr/bin/
+consul -autocomplete-install
 
+## Set keys
 export CONSUL_HTTP_ADDR="${consul_http}"
 export CONSUL_HTTP_TOKEN="${consul_token}"
 
-/snap/bin/consul kv put wireguard/server_public_key `cat /etc/wireguard/publickey`
-/snap/bin/consul kv put wireguard/server_private_key `cat /etc/wireguard/privatekey`
+consul kv put wireguard/server_public_key @/etc/wireguard/publickey
+consul kv put wireguard/server_private_key @/etc/wireguard/privatekey
 
+## Download Wireguard configuration file 
 
-## Generate Wireguard configuration file 
-cat <<EOF > /etc/wireguard/wg0.conf
-[Interface]
-Address = 192.168.0.2/24
-SaveConfig = true
-PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o ens3 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o ens3 -j MASQUERADE
-ListenPort = 51820
-PrivateKey = PRIVATE_KEY_PLACEHOLDER
-
-[Peer]
-PublicKey = ${client_public_key}
-EOF 
+export CLIENT_PUBLIC_KEY=${client_public_key}
+sed -i "|CLIENT_PUBLIC_KEY_PLACEHOLDER|$CLIENT_PUBLIC_KEY|" /etc/wireguard/wg0.conf
 
 PRIVATE_KEY=`cat /etc/wireguard/privatekey`
 
 sed -i "|PRIVATE_KEY_PLACEHOLDER|$PRIVATE_KEY|" /etc/wireguard/wg0.conf
 
-cat <<EOF > /var/lib/cloud/scripts/per-once 
+## Download cloud-init per-once script 
 
-systemctl enable wg-quick@wg0
+chmod +x /var/lib/cloud/scripts/start-wg.sh
 
-EOF 
-
-chmod +x /var/lib/cloud/scripts/per-once
-
-echo "reboot" | at now + 2 minutes
-
+/usr/bin/at now + 2 minutes <<END
+reboot
+END

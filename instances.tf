@@ -13,7 +13,7 @@ resource "ibm_is_instance" "wireguard_instance" {
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[0]
-  keys      = [data.ibm_is_ssh_key.regional_ssh_key.id]
+  keys      = [data.ibm_is_ssh_key.tycho_ssh_key.id, data.ibm_is_ssh_key.hyperion_ssh_key.id]
   user_data = templatefile("${path.module}/installer.sh", { client_public_key = var.client_public_key, consul_token = var.consul_token, consul_http = var.consul_http })
 }
 
@@ -32,7 +32,7 @@ resource "ibm_is_instance" "z1_instance" {
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[0]
-  keys      = [data.ibm_is_ssh_key.regional_ssh_key.id]
+  keys      = [data.ibm_is_ssh_key.tycho_ssh_key.id, data.ibm_is_ssh_key.hyperion_ssh_key.id]
   user_data = file("${path.module}/install.yml")
 }
 
@@ -51,7 +51,7 @@ resource "ibm_is_instance" "z2_instance" {
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[1]
-  keys      = [data.ibm_is_ssh_key.regional_ssh_key.id]
+  keys      = [data.ibm_is_ssh_key.tycho_ssh_key.id, data.ibm_is_ssh_key.hyperion_ssh_key.id]
   user_data = file("${path.module}/install.yml")
 }
 
@@ -70,6 +70,6 @@ resource "ibm_is_instance" "z3_instance" {
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[2]
-  keys      = [data.ibm_is_ssh_key.regional_ssh_key.id]
+  keys      = [data.ibm_is_ssh_key.tycho_ssh_key.id, data.ibm_is_ssh_key.hyperion_ssh_key.id]
   user_data = file("${path.module}/install.yml")
 }

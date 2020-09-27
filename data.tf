@@ -7,8 +7,12 @@ data "ibm_is_zones" "regional_zones" {
   region = var.region
 }
 
-data "ibm_is_ssh_key" "regional_ssh_key" {
-  name = var.ssh_key
+data "ibm_is_ssh_key" "tycho_ssh_key" {
+  name = var.tycho_ssh_key
+}
+
+data "ibm_is_ssh_key" "hyperion_ssh_key" {
+  name = var.hyperion_ssh_key
 }
 
 data "ibm_is_image" "default" {

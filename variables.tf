@@ -4,10 +4,16 @@ variable "region" {
   default     = "us-east"
 }
 
-variable "ssh_key" {
+variable "tycho_ssh_key" {
   type        = string
   description = "The SSH Key that will be added to the compute instances in the region."
   default     = "ryan-tycho-us-east"
+}
+
+variable "hyperion_ssh_key" {
+  type        = string
+  description = "The SSH Key that will be added to the compute instances in the region."
+  default     = "hyperion-us-east"
 }
 
 variable "default_instance_profile" {
