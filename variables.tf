@@ -67,3 +67,9 @@ variable "vpc_name" {
   description = "Name of vpc and related resources"
   default     = "wgtest"
 }
+
+variable "client_private_key" {
+  type        = string
+  description = "Private WG key used to populate local wg file."
+  default     = ""
+}

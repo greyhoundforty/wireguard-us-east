@@ -1,5 +1,5 @@
 resource "ibm_is_instance" "wireguard_instance" {
-  name    = "${var.vpc_name}-wg"
+  name    = "${var.vpc_name}-wg-${local.project}"
   image   = data.ibm_is_image.default.id
   profile = var.default_instance_profile
 
@@ -9,7 +9,7 @@ resource "ibm_is_instance" "wireguard_instance" {
   }
 
   resource_group = data.ibm_resource_group.rg.id
-  tags           = ["ryantiffany", var.region]
+  tags           = ["ryantiffany", var.region, local.project]
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[0]
@@ -18,7 +18,7 @@ resource "ibm_is_instance" "wireguard_instance" {
 }
 
 resource "ibm_is_instance" "z1_instance" {
-  name    = "${var.vpc_name}-z1"
+  name    = "${var.vpc_name}-z1-${local.project}"
   image   = data.ibm_is_image.default.id
   profile = var.default_instance_profile
 
@@ -28,7 +28,7 @@ resource "ibm_is_instance" "z1_instance" {
   }
 
   resource_group = data.ibm_resource_group.rg.id
-  tags           = ["ryantiffany", var.region]
+  tags           = ["ryantiffany", var.region, local.project]
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[0]
@@ -37,7 +37,7 @@ resource "ibm_is_instance" "z1_instance" {
 }
 
 resource "ibm_is_instance" "z2_instance" {
-  name    = "${var.vpc_name}-z2"
+  name    = "${var.vpc_name}-z2-${local.project}"
   image   = data.ibm_is_image.default.id
   profile = var.default_instance_profile
 
@@ -47,7 +47,7 @@ resource "ibm_is_instance" "z2_instance" {
   }
 
   resource_group = data.ibm_resource_group.rg.id
-  tags           = ["ryantiffany", var.region]
+  tags           = ["ryantiffany", var.region, local.project]
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[1]
@@ -56,7 +56,7 @@ resource "ibm_is_instance" "z2_instance" {
 }
 
 resource "ibm_is_instance" "z3_instance" {
-  name    = "${var.vpc_name}-z3"
+  name    = "${var.vpc_name}-z3-${local.project}"
   image   = data.ibm_is_image.default.id
   profile = var.default_instance_profile
 
@@ -66,7 +66,7 @@ resource "ibm_is_instance" "z3_instance" {
   }
 
   resource_group = data.ibm_resource_group.rg.id
-  tags           = ["ryantiffany", var.region]
+  tags           = ["ryantiffany", var.region, local.project]
 
   vpc       = ibm_is_vpc.vpc.id
   zone      = data.ibm_is_zones.regional_zones.zones[2]

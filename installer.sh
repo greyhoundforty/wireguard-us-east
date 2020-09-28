@@ -9,6 +9,9 @@ DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef'
 
 systemctl enable --now atd
 
+echo "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf
+sysctl -p
+
 ## Generate Wireguard Public and Private Keys
 /usr/bin/wg genkey | tee /etc/wireguard/privatekey | /usr/bin/wg pubkey | tee /etc/wireguard/publickey
 
@@ -31,16 +34,22 @@ wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/w
 mv wg0.conf-example /etc/wireguard/wg0.conf
 
 export CLIENT_PUBLIC_KEY=${client_public_key}
-sed -i "|CLIENT_PUBLIC_KEY_PLACEHOLDER|$CLIENT_PUBLIC_KEY|" /etc/wireguard/wg0.conf
+sed -i "s|CLIENT_PUBLIC_KEY_PLACEHOLDER|$CLIENT_PUBLIC_KEY|" /etc/wireguard/wg0.conf
 
 PRIVATE_KEY=`cat /etc/wireguard/privatekey`
 
-sed -i "|PRIVATE_KEY_PLACEHOLDER|$PRIVATE_KEY|" /etc/wireguard/wg0.conf
+sed -i "s|PRIVATE_KEY_PLACEHOLDER|$PRIVATE_KEY|" /etc/wireguard/wg0.conf
 
 ## Download cloud-init per-once script 
-wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/start-wg.sh
-mv start-wg.sh /var/lib/cloud/scripts/start-wg.sh
-chmod +x /var/lib/cloud/scripts/start-wg.sh
+# wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/start-wg.sh
+# mv start-wg.sh /var/lib/cloud/scripts/start-wg.sh
+# chmod +x /var/lib/cloud/scripts/start-wg.sh
+
+systemctl enable wg-quick@wg0
+
+wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/add-wg-peer.sh -O /var/lib/cloud/scripts/per-boot/add-wg-peer.sh
+sed -i "s|CLIENT_PUBLIC_KEY_PLACEHOLDER|$CLIENT_PUBLIC_KEY|" /var/lib/cloud/scripts/per-boot/add-wg-peer.sh
+chmod +x /var/lib/cloud/scripts/per-boot/add-wg-peer.sh
 
 /usr/bin/at now + 2 minutes <<END
 reboot
