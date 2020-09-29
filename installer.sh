@@ -5,7 +5,7 @@ DEBIAN_FRONTEND=noninteractive apt-get -qqy update
 DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
 
 ## Install Wireguard and basic tools 
-DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl git wireguard at unzip 
+DEBIAN_FRONTEND=noninteractive apt-get -qqy -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl git wireguard at unzip resolvconf
 
 systemctl enable --now atd
 
@@ -47,10 +47,14 @@ sed -i "s|PRIVATE_KEY_PLACEHOLDER|$PRIVATE_KEY|" /etc/wireguard/wg0.conf
 
 systemctl enable wg-quick@wg0
 
-wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/add-wg-peer.sh -O /var/lib/cloud/scripts/per-boot/add-wg-peer.sh
-sed -i "s|CLIENT_PUBLIC_KEY_PLACEHOLDER|$CLIENT_PUBLIC_KEY|" /var/lib/cloud/scripts/per-boot/add-wg-peer.sh
-chmod +x /var/lib/cloud/scripts/per-boot/add-wg-peer.sh
+wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/add-wg-peer.sh -O /root/add-wg-peer.sh
+sed -i "s|CLIENT_PUBLIC_KEY_PLACEHOLDER|$CLIENT_PUBLIC_KEY|" /root/add-wg-peer.sh
+chmod +x /root/add-wg-peer.sh
 
-/usr/bin/at now + 2 minutes <<END
+/usr/bin/at now + 1 minutes <<END
 reboot
+END
+
+/usr/bin/at now + 5 minutes <<END
+/root/add-wg-peer.sh
 END

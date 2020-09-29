@@ -18,3 +18,11 @@ EOF
 output "wg_fip" {
   value = ibm_is_floating_ip.regional_fip.address
 }
+
+output "z1_instance_ip" {
+  value = ibm_is_instance.z1_instance.primary_network_interface[0].primary_ipv4_address
+}
+
+output "z2_instance_ip" {
+  value = ibm_is_instance.z2_instance.primary_network_interface[0].primary_ipv4_address
+}
