@@ -55,6 +55,12 @@ chmod +x /root/add-wg-peer.sh
 reboot
 END
 
+cat <<EOF > /var/lib/cloud/scripts/per-boot/schedule-tunnel.sh
+#!/usr/bin/env bash
 /usr/bin/at now + 5 minutes <<END
 /root/add-wg-peer.sh
 END
+
+EOF
+
+chmod +x /var/lib/cloud/scripts/per-boot/schedule-tunnel.sh
