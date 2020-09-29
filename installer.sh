@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ## Update machine
 DEBIAN_FRONTEND=noninteractive apt-get -qqy update
@@ -40,11 +40,6 @@ PRIVATE_KEY=`cat /etc/wireguard/privatekey`
 
 sed -i "s|PRIVATE_KEY_PLACEHOLDER|$PRIVATE_KEY|" /etc/wireguard/wg0.conf
 
-## Download cloud-init per-once script 
-# wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/start-wg.sh
-# mv start-wg.sh /var/lib/cloud/scripts/start-wg.sh
-# chmod +x /var/lib/cloud/scripts/start-wg.sh
-
 systemctl enable wg-quick@wg0
 
 wget https://raw.githubusercontent.com/greyhoundforty/wireguard-us-east/master/add-wg-peer.sh -O /root/add-wg-peer.sh
@@ -56,7 +51,7 @@ reboot
 END
 
 cat <<EOF > /var/lib/cloud/scripts/per-boot/schedule-tunnel.sh
-#!/usr/bin/env bash
+#!/bin/bash
 /usr/bin/at now + 5 minutes <<END
 /root/add-wg-peer.sh
 END
